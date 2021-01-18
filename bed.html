@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>Hospital</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@2.8.0"></script>
+  </head>
+  <body>
+    <h1>Bed Management in Real Time at the Point of Care for COVID-19 Patients</h1>
+    <canvas id="myChart" width="400" height="200"></canvas>
+  </body>
+</html>
+
+<script>
+  window.addEventListener('load', plot);
+
+  async function plot() { //ye ek async function hain... 
+                          //do function ko ek mein merge kiya kyunki async call kaam nhi kr rhi thi sahi se..
+                          
+    var st = []; //made both these arrays global
+    var tb = [];
+
+    fetch('https://api.rootnet.in/covid19-in/hospitals/beds')
+    .then(function(resp){  //phele data fetch hoga
+        return resp.json();
+    })
+    .then(function(obj){  //fir data ko parse krenge
+        for(i = 0; i < obj.data.regional.length; i++)
+        {
+          st.push(obj.data.regional[i].state);
+          tb.push(obj.data.regional[i].totalBeds);
+        } 
+    })
+    .then(function(){ //fir ussi data ko use krke graph banyenge
+
+    const ctx = document.getElementById('myChart').getContext('2d');
+    const myChart = new Chart(ctx, {
+          type: 'bar',
+          data: {
+            labels: st,
+            datasets: [
+              {
+                label: 'Count of hospital beds',
+                data: tb,
+                fill: false,
+                borderColor: 'rgba(255, 99, 132, 1)',
+                backgroundColor: 'rgba(255, 99, 132, 0.5)',
+                borderWidth: 3
+              }
+            ]
+          }
+      });
+    });
+  }
+
+</script>
